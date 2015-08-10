@@ -1,7 +1,7 @@
 .DS_Store
+foundit
+password.txt
 *.swp
-found-that
-found-it
 *.pub
 *.pem
 *.csr

@@ -18,14 +18,17 @@ package main
 
 import (
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"net/smtp"
 
 	"github.com/yhat/scrape"
 	"golang.org/x/net/html"
 )
 
 var tpl = template.Must(template.ParseGlob("templates/*"))
+var emailPassword, readErr = ioutil.ReadFile("./password.txt")
 
 type page struct {
 	Title   string
@@ -80,6 +83,19 @@ func (q *query) Scrape() []*match {
 	return matches
 }
 
+// Send emails the results of a successful match
+func (m *match) Send(recipient string) error {
+
+	to := []string{recipient}
+	body := []byte(m.Description)
+
+	username := "ben@boltmedia.ca"
+	password := string(emailPassword)
+	auth := smtp.PlainAuth("smtp.gmail.com:587", username, password, "smtp.gmail.com")
+
+	return smtp.SendMail("smtp.gmail.com:587", auth, "ben@boltmedia.ca", to, body)
+}
+
 // HomeHandler handles the HTTP request
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
@@ -100,7 +116,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		query := &query{
 			SiteURL:  template.HTMLEscapeString(r.Form.Get("SiteURL")),
 			Keywords: template.HTMLEscapeString(r.Form.Get("Keywords")),
-			Email:    template.HTMLEscapeString(r.Form.Get("Email")),
+			Email:    r.Form.Get("Email"),
 		}
 		matches := query.Scrape()
 
@@ -108,6 +124,11 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatalln("Couldn't render page after POSTing: ", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		err = matches[0].Send(query.Email)
+		if err != nil {
+			log.Fatalln("Couldn't send email: ", err)
 		}
 	}
 }
