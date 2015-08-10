@@ -1,0 +1,7 @@
+.DS_Store
+*.swp
+found-that
+found-it
+*.pub
+*.pem
+*.csr
