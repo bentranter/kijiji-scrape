@@ -29,8 +29,9 @@ import (
 var tpl = template.Must(template.ParseGlob("templates/*"))
 
 type page struct {
-	Title string
-	Body  string
+	Title   string
+	Body    string
+	Matches []*match
 }
 
 type query struct {
@@ -44,6 +45,7 @@ type match struct {
 	Description string
 	Link        string
 	Price       string // Can be number, "swap/trade", or "please contact"
+	Matched     bool
 }
 
 // Scrape scrapes a site for a keyword
@@ -69,9 +71,10 @@ func (q *query) Scrape() []*match {
 	for i, post := range posts {
 		matches[i] = &match{
 			Title:       scrape.Text(post.FirstChild.NextSibling),
-			Description: scrape.Text(post.NextSibling.NextSibling),
-			Link:        scrape.Text(post),
-			Price:       scrape.Attr(post.FirstChild.NextSibling, "href"),
+			Description: scrape.Text(post),
+			Link:        "http://kijiji.ca" + scrape.Attr(post.FirstChild.NextSibling, "href"),
+			Price:       scrape.Text(post.NextSibling.NextSibling),
+			Matched:     false,
 		}
 		fmt.Printf("\033[32m%s\033[0m - \033[33m%s\033[0m\n%s\n\033[36mhttp://kijiji.ca%s\033[0m\n\n", scrape.Text(post.FirstChild.NextSibling), scrape.Text(post.NextSibling.NextSibling), scrape.Text(post), scrape.Attr(post.FirstChild.NextSibling, "href"))
 	}
@@ -84,7 +87,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 
 	case "GET":
-		err := tpl.ExecuteTemplate(w, "home", &page{"Home", "Welcome home."})
+		err := tpl.ExecuteTemplate(w, "home", &page{"Home", "Welcome home.", nil})
 		if err != nil {
 			log.Fatalln("Couldn't render home page template", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -102,11 +105,10 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 			Email:    template.HTMLEscapeString(r.Form.Get("Email")),
 		}
 		matches := query.Scrape()
-		fmt.Println(matches[0])
 
-		err = tpl.ExecuteTemplate(w, "home", &page{"Home - Post", "Posted to home."})
+		err = tpl.ExecuteTemplate(w, "preview", &page{"Matches", "Showing all matches.", matches})
 		if err != nil {
-			log.Fatalln("Couldn't render home page after POSTing")
+			log.Fatalln("Couldn't render page after POSTing: ", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}

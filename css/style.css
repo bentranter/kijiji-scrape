@@ -4,3 +4,8 @@ html, body {
   color: #333;
   margin: 2rem;
 }
+
+.dib { display: inline-block }
+.ml2 { margin-left: 2rem }
+.center { text-align: center }
+.container { max-width: 52rem; margin: 0 auto }
