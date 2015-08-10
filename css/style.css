@@ -9,3 +9,29 @@ html, body {
 .ml2 { margin-left: 2rem }
 .center { text-align: center }
 .container { max-width: 52rem; margin: 0 auto }
+
+form > label {
+  display: block;
+}
+
+form > input {
+  display: block;
+  font-size: 1rem;
+  width: 12rem;
+  margin-bottom: .875rem;
+}
+
+input[type="submit"] {
+  font-size: .875rem;
+  width: 6rem;
+  background: #f4f4f6;
+  border: 1px solid #ececef;
+  border-radius: 0;
+}
+
+input[type="submit"]:hover,
+input[type="submit"]:focus {
+  cursor: pointer;
+  color: #fff;
+  background: #19b5fe;
+}

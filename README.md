@@ -11,4 +11,4 @@ $ go get github.com/yhat/scrape
 $ go get golang.org/x/net/html
 ```
 
-Once you've got those, you can just `$ go run`. Open your browser to port 3000, and keep and eye on your console output.
+Once you've got those, you can just `$ go run`. Open your browser to port 3000 one it starts.

@@ -17,7 +17,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -76,7 +75,6 @@ func (q *query) Scrape() []*match {
 			Price:       scrape.Text(post.NextSibling.NextSibling),
 			Matched:     false,
 		}
-		fmt.Printf("\033[32m%s\033[0m - \033[33m%s\033[0m\n%s\n\033[36mhttp://kijiji.ca%s\033[0m\n\n", scrape.Text(post.FirstChild.NextSibling), scrape.Text(post.NextSibling.NextSibling), scrape.Text(post), scrape.Attr(post.FirstChild.NextSibling, "href"))
 	}
 
 	return matches
