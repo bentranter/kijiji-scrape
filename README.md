@@ -1,6 +1,6 @@
-# FoundIt
+# Kijiji Scrape
 
-Get an email within five minutes of when the Kijiji item you want gets posted.
+Get an email within five minutes of when the Kijiji item you want gets posted. (Not really though)
 
 ### Usage
 
