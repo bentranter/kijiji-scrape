@@ -134,23 +134,35 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func initRedis() redis.Client {
+func initRedis() *redis.Client {
 	client := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "",
 		DB:       0,
 	})
 
-	return *client
+	return client
+}
+
+func redisTestHandler(a *App, w http.ResponseWriter, r *http.Request) error {
+	pong, err := a.DB.Ping().Result()
+	if err != nil {
+		return err
+	}
+	w.Write([]byte(pong))
+	return nil
 }
 
 func main() {
 
 	log.Println("Serving HTTP on port 3000")
-	initRedis()
+	redisClient := initRedis()
+
+	app := App{DB: redisClient}
 
 	// Routes for handlers
 	http.HandleFunc("/", HomeHandler)
+	http.Handle("/redis", app.Handle(redisTestHandler))
 
 	// Static assets
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css/"))))
@@ -158,4 +170,29 @@ func main() {
 
 	// Start server
 	http.ListenAndServe(":3000", nil)
+}
+
+// App stores gloabls & context vars
+type App struct {
+	DB *redis.Client
+}
+
+// Handler executes middleware and provides a ref to our
+// global App struct
+type Handler func(a *App, w http.ResponseWriter, r *http.Request) error
+
+// Handle executes all our middleware. Each middleware
+// function accepts an extra argument: the `a *app.App`,
+// which is our global context variable
+func (a *App) Handle(handlers ...Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for _, handler := range handlers {
+			err := handler(a, w, r)
+			if err != nil {
+				// Lazily handle errors for now
+				w.Write([]byte(err.Error()))
+				return
+			}
+		}
+	})
 }
