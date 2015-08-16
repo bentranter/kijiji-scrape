@@ -25,6 +25,7 @@ import (
 
 	"github.com/yhat/scrape"
 	"golang.org/x/net/html"
+	"gopkg.in/redis.v3"
 )
 
 var tpl = template.Must(template.ParseGlob("templates/*"))
@@ -133,9 +134,20 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func initRedis() redis.Client {
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+
+	return *client
+}
+
 func main() {
 
 	log.Println("Serving HTTP on port 3000")
+	initRedis()
 
 	// Routes for handlers
 	http.HandleFunc("/", HomeHandler)
