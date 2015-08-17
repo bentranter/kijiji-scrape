@@ -98,7 +98,7 @@ func (m *match) Send(recipient string) error {
 }
 
 // HomeHandler handles the HTTP request
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
+func HomeHandler(a *App, w http.ResponseWriter, r *http.Request) error {
 	switch r.Method {
 
 	case "GET":
@@ -106,12 +106,15 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatalln("Couldn't render home page template", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return err
 		}
+		return nil
 
 	case "POST":
 		err := r.ParseForm()
 		if err != nil {
 			panic(err)
+			return err
 		}
 
 		query := &query{
@@ -125,13 +128,17 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatalln("Couldn't render page after POSTing: ", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return err
 		}
 
 		err = matches[0].Send(query.Email)
 		if err != nil {
 			log.Fatalln("Couldn't send email: ", err)
+			return err
 		}
+		return nil
 	}
+	return nil
 }
 
 func initRedis() *redis.Client {
@@ -161,7 +168,7 @@ func main() {
 	app := App{DB: redisClient}
 
 	// Routes for handlers
-	http.HandleFunc("/", HomeHandler)
+	http.Handle("/", app.Handle(HomeHandler))
 	http.Handle("/redis", app.Handle(redisTestHandler))
 
 	// Static assets
