@@ -1,4 +1,4 @@
-// Package main implements `foundit.io`. Found It is a
+// Package main implements a web scraper. It's basically a
 // service that monitors sites like Kijiji or Etsy, and
 // notifies you when a new ad matching the stuff you want
 // gets posted. Here's my implmentation idea:
