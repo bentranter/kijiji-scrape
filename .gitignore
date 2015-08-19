@@ -5,3 +5,4 @@ password.txt
 *.pub
 *.pem
 *.csr
+*.rdb
