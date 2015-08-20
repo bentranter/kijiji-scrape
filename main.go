@@ -17,11 +17,13 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/smtp"
+	"time"
 
 	"github.com/yhat/scrape"
 	"golang.org/x/net/html"
@@ -111,11 +113,16 @@ func HomeHandler(a *App, w http.ResponseWriter, r *http.Request) error {
 		return nil
 
 	case "POST":
+		// Get current time
+		t := time.Now()
+
 		err := r.ParseForm()
 		if err != nil {
 			panic(err)
 			return err
 		}
+
+		fmt.Println("Time spent parsing form: ", time.Since(t))
 
 		query := &query{
 			SiteURL:  template.HTMLEscapeString(r.Form.Get("SiteURL")),
@@ -124,6 +131,8 @@ func HomeHandler(a *App, w http.ResponseWriter, r *http.Request) error {
 		}
 		matches := query.Scrape()
 
+		fmt.Println("Time spent scraping form: ", time.Since(t))
+
 		err = tpl.ExecuteTemplate(w, "preview", &page{"Matches", "Showing all matches.", matches})
 		if err != nil {
 			log.Fatalln("Couldn't render page after POSTing: ", err)
@@ -131,11 +140,15 @@ func HomeHandler(a *App, w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 
+		fmt.Println("Time spent rendering template: ", time.Since(t))
+
 		err = matches[0].Send(query.Email)
 		if err != nil {
 			log.Fatalln("Couldn't send email: ", err)
 			return err
 		}
+
+		fmt.Println("Time spent sending email: ", time.Since(t))
 		return nil
 	}
 	return nil
