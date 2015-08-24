@@ -1,18 +1,18 @@
 {{ define "home" }}
 {{ template "head" . }}
   <h1 class='center'>{{ .Title }}</h1>
-  <form action='/' method='POST'>
+  <form id='form' action='/' method='POST'>
 
     <label for='SiteURL'>URL</label>
-    <input type='text' name='SiteURL' required>
+    <input id='siteurl' type='text' name='SiteURL' required>
 
     <label for='Keywords'>Keywords</label>
-    <input type='text' name='Keywords' required>
+    <input id='keywords' type='text' name='Keywords' required>
 
     <label for='Email'>Your Email</label>
-    <input type='email' name='Email' required>
+    <input id='email' type='email' name='Email' required>
 
-    <input type='submit' value='Go'>
+    <input id='submit' type='submit' value='Go'>
   </form>
 {{ template "foot" }}
 {{ end }}

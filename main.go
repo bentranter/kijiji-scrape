@@ -123,6 +123,7 @@ func HomeHandler(a *App, w http.ResponseWriter, r *http.Request) error {
 		}
 
 		fmt.Println("Time spent parsing form: ", time.Since(t))
+		t = time.Now()
 
 		query := &query{
 			SiteURL:  template.HTMLEscapeString(r.Form.Get("SiteURL")),
@@ -132,6 +133,7 @@ func HomeHandler(a *App, w http.ResponseWriter, r *http.Request) error {
 		matches := query.Scrape()
 
 		fmt.Println("Time spent scraping form: ", time.Since(t))
+		t = time.Now()
 
 		err = tpl.ExecuteTemplate(w, "preview", &page{"Matches", "Showing all matches.", matches})
 		if err != nil {
@@ -141,6 +143,7 @@ func HomeHandler(a *App, w http.ResponseWriter, r *http.Request) error {
 		}
 
 		fmt.Println("Time spent rendering template: ", time.Since(t))
+		t = time.Now()
 
 		err = matches[0].Send(query.Email)
 		if err != nil {
