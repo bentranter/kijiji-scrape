@@ -1,6 +1,22 @@
 (function() {
   'use strict';
 
+  // Function hoisting = dumb
+  /**
+   * Build DOM??
+   */
+  var dom = {
+    h1: function() {
+      // Do whatever
+      console.log('me are h1');
+      return this; // Please don't ruin my code, `this`
+    },
+    h2: function() {
+      console.log('me are h2');
+      return this;
+    }
+  }
+
   ajax({
     url: 'http://127.0.0.1:3000/',
     method: 'GET',
@@ -18,7 +34,7 @@
   });
 
   // 'Dreamcode'
-  dom.h1()
+  dom.h1().h2();
 })();
 
 /**
@@ -43,15 +59,4 @@ function ajax(req) {
 
   xhr.onloadend = req.success;
   xhr.onerror = req.error;
-}
-
-/**
- * Build DOM
- */
-var dom = {
-  h1: function() {
-    // Do whatever
-    return this; // Please don't ruin my code, `this`
-  }
-
 }
