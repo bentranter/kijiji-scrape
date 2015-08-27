@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  fetch({
+  ajax({
     url: 'http://127.0.0.1:3000/',
     method: 'GET',
     data: {
@@ -16,6 +16,9 @@
       console.log('Error');
     }
   });
+
+  // 'Dreamcode'
+  dom.h1()
 })();
 
 /**
@@ -23,10 +26,7 @@
  *
  * @param {Object} the setings
  */
-function fetch(req) {
-
-  // Remoe this nonsense
-  req = req || {};
+function ajax(req) {
 
   var xhr = new XMLHttpRequest();
   xhr.open(req.method, req.url);
@@ -43,4 +43,15 @@ function fetch(req) {
 
   xhr.onloadend = req.success;
   xhr.onerror = req.error;
+}
+
+/**
+ * Build DOM
+ */
+var dom = {
+  h1: function() {
+    // Do whatever
+    return this; // Please don't ruin my code, `this`
+  }
+
 }
